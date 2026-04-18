@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Eagle Bridge</title>
+    <style>
+      :root {
+        --fg: #1e1e1e;
+        --muted: #6c6f73;
+        --accent: #7c5cff;
+        --border: #e4e6ea;
+        --danger: #c92626;
+        --ok: #0a8754;
+        --bg: #ffffff;
+      }
+      html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); font: 12px/1.4 Inter, -apple-system, system-ui, sans-serif; }
+      .app { padding: 16px; display: flex; flex-direction: column; gap: 12px; height: 100vh; box-sizing: border-box; }
+      h1 { margin: 0; font-size: 13px; font-weight: 600; }
+      .muted { color: var(--muted); font-size: 11px; }
+      label { display: flex; flex-direction: column; gap: 4px; }
+      .label-text { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+      input { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font: inherit; font-family: "SF Mono", Menlo, monospace; }
+      input:focus { outline: none; border-color: var(--accent); }
+      .row { display: flex; gap: 8px; }
+      button { background: var(--accent); color: white; border: 0; border-radius: 6px; padding: 8px 14px; font: inherit; font-weight: 500; cursor: pointer; }
+      button.secondary { background: transparent; border: 1px solid var(--border); color: var(--fg); }
+      button:disabled { opacity: 0.5; cursor: wait; }
+      .status { min-height: 32px; font-size: 11px; color: var(--muted); }
+      .status[data-kind="error"] { color: var(--danger); }
+      .status[data-kind="ok"] { color: var(--ok); }
+      .footer { margin-top: auto; font-size: 10px; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <form id="form" class="app">
+      <div>
+        <h1>Eagle Bridge</h1>
+        <div class="muted">Paste the port &amp; code shown in Eagle.</div>
+      </div>
+
+      <label>
+        <span class="label-text">Port</span>
+        <input id="port" inputmode="numeric" autocomplete="off" placeholder="54321" required />
+      </label>
+      <label>
+        <span class="label-text">Code</span>
+        <input id="code" inputmode="numeric" autocomplete="off" placeholder="123456" maxlength="6" required />
+      </label>
+
+      <div class="status" id="status"></div>
+
+      <div class="row">
+        <button id="import-btn" type="submit">Import</button>
+        <button id="cancel-btn" type="button" class="secondary">Close</button>
+      </div>
+
+      <div class="footer">Loopback only — both apps must run on this machine.</div>
+    </form>
+  </body>
+</html>

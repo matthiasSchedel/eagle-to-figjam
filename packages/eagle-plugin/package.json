@@ -1,0 +1,19 @@
+{
+  "name": "@eagle-to-figjam/eagle-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Eagle plugin that serves selected images over a localhost bridge for the FigJam companion to pull.",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --platform=node --target=node16 --external:sharp --outfile=dist/main.js && cp src/ui.html dist/ui.html && cp manifest.json dist/manifest.json && (cp logo.png dist/logo.png 2>/dev/null || true)",
+    "dev": "esbuild src/main.ts --bundle --platform=node --target=node16 --external:sharp --outfile=dist/main.js --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "sharp": "^0.33.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "esbuild": "^0.21.4"
+  }
+}

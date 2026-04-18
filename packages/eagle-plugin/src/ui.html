@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Send to FigJam</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #111418;
+        --fg: #e8ecf1;
+        --muted: #8b94a3;
+        --accent: #7c5cff;
+        --card: #1a1f27;
+        --border: #262c36;
+        --danger: #ff6b6b;
+      }
+      html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); font: 13px/1.45 -apple-system, system-ui, sans-serif; }
+      .app { padding: 20px; display: flex; flex-direction: column; gap: 14px; height: 100vh; box-sizing: border-box; }
+      h1 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: 0.2px; }
+      .muted { color: var(--muted); }
+      .status { min-height: 18px; color: var(--muted); }
+      .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+      .pair { display: grid; grid-template-columns: auto auto; gap: 6px 18px; align-items: baseline; }
+      .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+      .value { font-family: "SF Mono", Menlo, monospace; font-size: 22px; font-weight: 600; color: var(--accent); }
+      .hint { color: var(--muted); font-size: 12px; }
+      button { background: var(--accent); color: white; border: 0; border-radius: 8px; padding: 9px 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
+      button.secondary { background: transparent; border: 1px solid var(--border); color: var(--fg); }
+      button:hover { filter: brightness(1.1); }
+      .row { display: flex; gap: 8px; }
+      .skipped-header { margin-top: 10px; color: var(--muted); font-size: 11px; }
+      .skipped-row { color: var(--muted); font-size: 12px; }
+      .error { color: var(--danger); }
+      [hidden] { display: none !important; }
+      .footer { margin-top: auto; color: var(--muted); font-size: 11px; }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <h1>Send to FigJam</h1>
+      <div id="status" class="status">Starting…</div>
+
+      <div id="session" class="card" hidden>
+        <div class="pair">
+          <span class="label">Port</span>
+          <span id="port" class="value">—</span>
+          <span class="label">Code</span>
+          <span id="code" class="value">—</span>
+        </div>
+        <div class="hint"><span id="count">0</span> image(s) ready. Expires in 5 min.</div>
+        <div id="skipped"></div>
+        <div class="row" style="margin-top: 12px">
+          <button id="copy-btn">Copy port + code</button>
+          <button id="retry-btn" class="secondary">Re-read selection</button>
+        </div>
+      </div>
+
+      <div id="empty" class="card" hidden>
+        <div>Select one or more images in Eagle, then re-open this plugin.</div>
+        <div class="row" style="margin-top: 10px">
+          <button id="retry-btn-empty" class="secondary" onclick="document.getElementById('retry-btn').click()">Retry</button>
+        </div>
+      </div>
+
+      <div id="error" class="card error" hidden></div>
+
+      <div class="footer">Open FigJam → Plugins → Development → <b>Eagle Bridge</b> → paste the code.</div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

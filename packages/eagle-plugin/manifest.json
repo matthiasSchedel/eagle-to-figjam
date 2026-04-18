@@ -1,0 +1,21 @@
+{
+  "id": "eagletofigjam",
+  "version": "0.1.0",
+  "name": "Send to FigJam",
+  "platform": "all",
+  "arch": "all",
+  "logo": "logo.png",
+  "keywords": ["figjam", "figma", "export", "bridge"],
+  "devTools": true,
+  "main": {
+    "url": "ui.html",
+    "width": 440,
+    "height": 360,
+    "minWidth": 440,
+    "minHeight": 360,
+    "maxWidth": 560,
+    "maxHeight": 480,
+    "resizable": true,
+    "backgroundColor": "#111418"
+  }
+}

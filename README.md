@@ -1,0 +1,46 @@
+# eagle-to-figjam
+
+One-click export of images selected in [Eagle](https://eagle.cool) onto the [FigJam](https://www.figma.com/figjam/) canvas.
+
+## How it works
+
+Two plugins talk over a short-lived local HTTP bridge:
+
+1. **Eagle plugin** — reads the current selection, encodes the images to base64, starts a localhost server on an ephemeral port, and shows a 6-digit pairing code.
+2. **FigJam plugin** — you paste the port + code, it pulls the images, and places each one as a rectangle with an image fill in a neat grid on the canvas.
+
+The server binds to `127.0.0.1` only, auto-closes after one successful pull or 5 minutes, and requires the pairing code as a query param.
+
+## Install (developer mode)
+
+```bash
+npm install
+npm run build
+```
+
+### Eagle
+Eagle → **Plugin** → **Developer** → **Import Local Project** → pick `packages/eagle-plugin/dist/` (after running `npm run build`).
+
+### FigJam (Figma desktop)
+Plugins → **Development** → **Import plugin from manifest…** → pick `packages/figjam-plugin/manifest.json`.
+
+## Use
+
+1. Select one or more images in Eagle.
+2. Run the **Send to FigJam** plugin → copy the shown port + code.
+3. In your FigJam file: **Plugins → Development → Eagle Bridge**. Paste port + code → click Import.
+4. Images land at the current viewport center, grouped, 4 columns.
+
+## Dev
+
+```bash
+npm run dev         # watches both packages
+npm test            # vitest
+npm run typecheck
+```
+
+## Limits
+
+- PNG / JPG / GIF only. Other files in the selection are skipped.
+- Images larger than 4096 px on the longest edge are downscaled before upload (Figma plugin API limit).
+- Both apps must be on the same machine (loopback only).
