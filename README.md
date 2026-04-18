@@ -29,7 +29,7 @@ npm run build
 ```
 
 ### Eagle
-After `npm run build`, Eagle → **Plugin** → **Developer** → **Import Local Project** → pick `packages/eagle-plugin/` (the folder containing `manifest.json`, not `dist/`). The manifest points at `dist/ui.html` internally.
+After `npm run build`, Eagle → **Plugin** → **Developer** → **Import Local Project** → pick `packages/eagle-plugin/`. The build writes `main.js` and `ui.html` next to `manifest.json` (Eagle's manifest loader doesn't resolve subdirectory paths).
 
 ### FigJam (Figma desktop)
 Plugins → **Development** → **Import plugin from manifest…** → pick `packages/figjam-plugin/manifest.json`.

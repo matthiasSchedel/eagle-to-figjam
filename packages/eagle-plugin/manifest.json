@@ -8,7 +8,7 @@
   "keywords": ["figjam", "figma", "export", "bridge"],
   "devTools": false,
   "main": {
-    "url": "dist/ui.html",
+    "url": "ui.html",
     "width": 440,
     "height": 360,
     "minWidth": 440,

@@ -6,15 +6,16 @@
   "ui": "dist/ui.html",
   "editorType": ["figjam"],
   "networkAccess": {
-    "allowedDomains": [
-      "http://127.0.0.1:41783",
-      "http://127.0.0.1:41784",
-      "http://127.0.0.1:41785",
-      "http://127.0.0.1:41786",
-      "http://127.0.0.1:41787",
-      "http://127.0.0.1:41788",
-      "http://127.0.0.1:41789",
-      "http://127.0.0.1:41790"
+    "allowedDomains": ["none"],
+    "devAllowedDomains": [
+      "http://localhost:41783",
+      "http://localhost:41784",
+      "http://localhost:41785",
+      "http://localhost:41786",
+      "http://localhost:41787",
+      "http://localhost:41788",
+      "http://localhost:41789",
+      "http://localhost:41790"
     ],
     "reasoning": "Fetches images from the Eagle app's local bridge (loopback only, fixed port range)."
   }

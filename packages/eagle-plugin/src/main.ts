@@ -105,25 +105,40 @@ function bindUi(): UiHooks {
   };
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  const ui = bindUi();
-  const copyBtn = document.getElementById("copy-btn") as HTMLButtonElement | null;
-  const retryBtn = document.getElementById("retry-btn") as HTMLButtonElement | null;
+function boot(): void {
+  console.log("[eagle-to-figjam] boot");
+  try {
+    const ui = bindUi();
+    const copyBtn = document.getElementById("copy-btn") as HTMLButtonElement | null;
+    const retryBtn = document.getElementById("retry-btn") as HTMLButtonElement | null;
 
-  copyBtn?.addEventListener("click", () => {
-    const port = document.getElementById("port")?.textContent ?? "";
-    const code = document.getElementById("code")?.textContent ?? "";
-    void navigator.clipboard.writeText(`${port} ${code}`);
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => (copyBtn.textContent = "Copy port + code"), 1200);
-  });
+    copyBtn?.addEventListener("click", () => {
+      const port = document.getElementById("port")?.textContent ?? "";
+      const code = document.getElementById("code")?.textContent ?? "";
+      void navigator.clipboard.writeText(`${port} ${code}`);
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => (copyBtn.textContent = "Copy port + code"), 1200);
+    });
 
-  retryBtn?.addEventListener("click", () => {
+    retryBtn?.addEventListener("click", () => {
+      void run(ui);
+    });
+
     void run(ui);
-  });
+  } catch (err) {
+    console.error("[eagle-to-figjam] boot failed", err);
+    document.body.innerHTML =
+      `<pre style="color:#ff6b6b;background:#111418;padding:20px;font:12px monospace;white-space:pre-wrap;">` +
+      `Send to FigJam failed to start:\n\n${(err as Error).stack ?? (err as Error).message ?? String(err)}` +
+      `</pre>`;
+  }
+}
 
-  void run(ui);
-});
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", boot);
+} else {
+  boot();
+}
 
 window.addEventListener("beforeunload", () => {
   void activeBridge?.close();

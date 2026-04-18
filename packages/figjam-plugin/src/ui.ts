@@ -43,7 +43,7 @@ async function doImport(): Promise<void> {
   setStatus("Connecting to Eagle bridge…");
 
   try {
-    const url = `http://127.0.0.1:${port}/session?code=${encodeURIComponent(code)}`;
+    const url = `http://localhost:${port}/session?code=${encodeURIComponent(code)}`;
     const res = await fetch(url, { method: "GET" });
     if (!res.ok) {
       setStatus(`Bridge returned ${res.status}. Is the Eagle plugin still open with this code?`, "error");
