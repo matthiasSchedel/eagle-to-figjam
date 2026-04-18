@@ -1,5 +1,5 @@
 import { encodeSelection } from "./encoder";
-import { startBridge, type BridgeHandle } from "./bridge";
+import { DEFAULT_PORTS, startBridge, type BridgeHandle } from "./bridge";
 import type { EagleItemLike } from "./types";
 
 declare const eagle: {
@@ -42,7 +42,7 @@ async function run(ui: UiHooks): Promise<void> {
     }
 
     ui.setStatus("Starting local bridge…");
-    const bridge = await startBridge({ images });
+    const bridge = await startBridge({ images, preferredPorts: DEFAULT_PORTS });
     activeBridge = bridge;
     ui.showSession(bridge.port, bridge.code, images.length, skipped);
   } catch (err) {

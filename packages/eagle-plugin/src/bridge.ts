@@ -5,6 +5,10 @@ import type { SessionPayload, EncodedImage } from "./types";
 const TTL_MS = 5 * 60 * 1000;
 const HOST = "127.0.0.1";
 
+// Fixed port range so the FigJam manifest's allowedDomains can be explicit
+// (Figma rejects port wildcards in allowedDomains).
+export const DEFAULT_PORTS = [41783, 41784, 41785, 41786, 41787, 41788, 41789, 41790];
+
 export interface BridgeHandle {
   port: number;
   code: string;
@@ -17,6 +21,8 @@ export interface StartBridgeOpts {
   ttlMs?: number;
   now?: () => number;
   code?: string;
+  /** Ports to try in order. If empty, uses an OS-assigned ephemeral port. */
+  preferredPorts?: number[];
 }
 
 export function generateCode(): string {
@@ -104,16 +110,39 @@ export function startBridge(opts: StartBridgeOpts): Promise<BridgeHandle> {
     });
   }
 
+  const ports = opts.preferredPorts && opts.preferredPorts.length > 0 ? opts.preferredPorts : [0];
+  return tryListen(server, ports).then((port) => ({ port, code, close, server }));
+}
+
+function tryListen(server: Server, ports: number[]): Promise<number> {
   return new Promise((resolve, reject) => {
-    server.once("error", reject);
-    server.listen(0, HOST, () => {
-      const addr = server.address();
-      if (!addr || typeof addr === "string") {
-        void close();
-        reject(new Error("failed to bind bridge server"));
+    const errors: string[] = [];
+    const attempt = (idx: number): void => {
+      if (idx >= ports.length) {
+        reject(new Error(`bridge: no free port in range (${errors.join(", ")})`));
         return;
       }
-      resolve({ port: addr.port, code, close, server });
-    });
+      const port = ports[idx]!;
+      const onError = (err: NodeJS.ErrnoException): void => {
+        errors.push(`${port}:${err.code ?? err.message}`);
+        server.removeListener("error", onError);
+        if (err.code === "EADDRINUSE") {
+          attempt(idx + 1);
+        } else {
+          reject(err);
+        }
+      };
+      server.once("error", onError);
+      server.listen(port, HOST, () => {
+        server.removeListener("error", onError);
+        const addr = server.address();
+        if (!addr || typeof addr === "string") {
+          reject(new Error("bridge: failed to resolve bound address"));
+          return;
+        }
+        resolve(addr.port);
+      });
+    };
+    attempt(0);
   });
 }

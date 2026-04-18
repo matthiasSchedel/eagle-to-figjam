@@ -29,6 +29,11 @@ async function doImport(): Promise<void> {
     setStatus("Port looks invalid.", "error");
     return;
   }
+  const portNum = Number(port);
+  if (portNum < 41783 || portNum > 41790) {
+    setStatus("Port must be 41783–41790 (manifest allowlist).", "error");
+    return;
+  }
   if (!/^\d{6}$/.test(code)) {
     setStatus("Code must be 6 digits.", "error");
     return;

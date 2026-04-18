@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { createServer } from "node:http";
 import { startBridge } from "../src/bridge";
 import type { EncodedImage } from "../src/types";
 
@@ -66,6 +67,47 @@ describe("startBridge", () => {
     await expect(
       fetch(`http://127.0.0.1:${bridge.port}/session?code=111111`),
     ).rejects.toBeDefined();
+  });
+
+  it("falls back to the next preferred port when the first is in use", async () => {
+    const squatters = [createServer(), createServer()];
+    await Promise.all(
+      squatters.map(
+        (s, i) =>
+          new Promise<void>((resolve, reject) => {
+            s.once("error", reject);
+            s.listen(45000 + i, "127.0.0.1", () => resolve());
+          }),
+      ),
+    );
+    try {
+      const bridge = await startBridge({
+        images: sampleImages,
+        code: "111111",
+        preferredPorts: [45000, 45001, 45002],
+      });
+      cleanup = bridge.close;
+      expect(bridge.port).toBe(45002);
+    } finally {
+      await Promise.all(
+        squatters.map((s) => new Promise<void>((resolve) => s.close(() => resolve()))),
+      );
+    }
+  });
+
+  it("rejects when no preferred port is free", async () => {
+    const squatter = createServer();
+    await new Promise<void>((resolve, reject) => {
+      squatter.once("error", reject);
+      squatter.listen(45010, "127.0.0.1", () => resolve());
+    });
+    try {
+      await expect(
+        startBridge({ images: sampleImages, code: "111111", preferredPorts: [45010] }),
+      ).rejects.toThrow(/no free port/);
+    } finally {
+      await new Promise<void>((resolve) => squatter.close(() => resolve()));
+    }
   });
 
   it("expires payload after TTL", async () => {
