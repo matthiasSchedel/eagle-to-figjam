@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "lib": ["ES2020", "DOM"],
+    "target": "ES2017",
+    "lib": ["ES2017", "DOM"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "types": ["@figma/plugin-typings"]

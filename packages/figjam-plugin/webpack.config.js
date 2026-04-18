@@ -17,6 +17,7 @@ module.exports = (_env, argv) => ({
       { test: /\.tsx?$/, use: "ts-loader", exclude: /node_modules/ },
     ],
   },
+  target: ["web", "es2017"],
   resolve: { extensions: [".ts", ".tsx", ".js"] },
   plugins: [
     new HtmlWebpackPlugin({

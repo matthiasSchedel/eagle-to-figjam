@@ -4,6 +4,8 @@ import type { EagleItemLike } from "./types";
 
 declare const eagle: {
   item: { getSelected: () => Promise<EagleItemLike[]> };
+  onPluginCreate?: (cb: () => void | Promise<void>) => void;
+  onPluginRun?: (cb: () => void | Promise<void>) => void;
 };
 
 interface UiHooks {
@@ -124,7 +126,14 @@ function boot(): void {
       void run(ui);
     });
 
-    void run(ui);
+    const start = (): void => void run(ui);
+    if (typeof eagle !== "undefined" && typeof eagle.onPluginCreate === "function") {
+      ui.setStatus("Waiting for Eagle…");
+      eagle.onPluginCreate(start);
+      if (typeof eagle.onPluginRun === "function") eagle.onPluginRun(start);
+    } else {
+      start();
+    }
   } catch (err) {
     console.error("[eagle-to-figjam] boot failed", err);
     document.body.innerHTML =
