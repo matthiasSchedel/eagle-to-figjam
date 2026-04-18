@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlInlineScriptPlugin = require("html-inline-script-webpack-plugin");
 
 module.exports = (_env, argv) => ({
   mode: argv.mode === "production" ? "production" : "development",
@@ -17,6 +18,7 @@ module.exports = (_env, argv) => ({
       { test: /\.tsx?$/, use: "ts-loader", exclude: /node_modules/ },
     ],
   },
+  target: ["web", "es2017"],
   resolve: { extensions: [".ts", ".tsx", ".js"] },
   plugins: [
     new HtmlWebpackPlugin({
@@ -26,5 +28,6 @@ module.exports = (_env, argv) => ({
       inject: "body",
       cache: false,
     }),
+    new HtmlInlineScriptPlugin(),
   ],
 });

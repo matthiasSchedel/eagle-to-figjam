@@ -1,9 +1,11 @@
 import { encodeSelection } from "./encoder";
-import { startBridge, type BridgeHandle } from "./bridge";
+import { DEFAULT_PORTS, startBridge, type BridgeHandle } from "./bridge";
 import type { EagleItemLike } from "./types";
 
 declare const eagle: {
   item: { getSelected: () => Promise<EagleItemLike[]> };
+  onPluginCreate?: (cb: () => void | Promise<void>) => void;
+  onPluginRun?: (cb: () => void | Promise<void>) => void;
 };
 
 interface UiHooks {
@@ -42,7 +44,7 @@ async function run(ui: UiHooks): Promise<void> {
     }
 
     ui.setStatus("Starting local bridge…");
-    const bridge = await startBridge({ images });
+    const bridge = await startBridge({ images, preferredPorts: DEFAULT_PORTS });
     activeBridge = bridge;
     ui.showSession(bridge.port, bridge.code, images.length, skipped);
   } catch (err) {
@@ -105,25 +107,47 @@ function bindUi(): UiHooks {
   };
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  const ui = bindUi();
-  const copyBtn = document.getElementById("copy-btn") as HTMLButtonElement | null;
-  const retryBtn = document.getElementById("retry-btn") as HTMLButtonElement | null;
+function boot(): void {
+  console.log("[eagle-to-figjam] boot");
+  try {
+    const ui = bindUi();
+    const copyBtn = document.getElementById("copy-btn") as HTMLButtonElement | null;
+    const retryBtn = document.getElementById("retry-btn") as HTMLButtonElement | null;
 
-  copyBtn?.addEventListener("click", () => {
-    const port = document.getElementById("port")?.textContent ?? "";
-    const code = document.getElementById("code")?.textContent ?? "";
-    void navigator.clipboard.writeText(`${port} ${code}`);
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => (copyBtn.textContent = "Copy port + code"), 1200);
-  });
+    copyBtn?.addEventListener("click", () => {
+      const port = document.getElementById("port")?.textContent ?? "";
+      const code = document.getElementById("code")?.textContent ?? "";
+      void navigator.clipboard.writeText(`${port} ${code}`);
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => (copyBtn.textContent = "Copy port + code"), 1200);
+    });
 
-  retryBtn?.addEventListener("click", () => {
-    void run(ui);
-  });
+    retryBtn?.addEventListener("click", () => {
+      void run(ui);
+    });
 
-  void run(ui);
-});
+    const start = (): void => void run(ui);
+    if (typeof eagle !== "undefined" && typeof eagle.onPluginCreate === "function") {
+      ui.setStatus("Waiting for Eagle…");
+      eagle.onPluginCreate(start);
+      if (typeof eagle.onPluginRun === "function") eagle.onPluginRun(start);
+    } else {
+      start();
+    }
+  } catch (err) {
+    console.error("[eagle-to-figjam] boot failed", err);
+    document.body.innerHTML =
+      `<pre style="color:#ff6b6b;background:#111418;padding:20px;font:12px monospace;white-space:pre-wrap;">` +
+      `Send to FigJam failed to start:\n\n${(err as Error).stack ?? (err as Error).message ?? String(err)}` +
+      `</pre>`;
+  }
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", boot);
+} else {
+  boot();
+}
 
 window.addEventListener("beforeunload", () => {
   void activeBridge?.close();

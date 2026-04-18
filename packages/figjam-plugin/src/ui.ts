@@ -4,7 +4,7 @@ const form = document.getElementById("form") as HTMLFormElement;
 const portInput = document.getElementById("port") as HTMLInputElement;
 const codeInput = document.getElementById("code") as HTMLInputElement;
 const status = document.getElementById("status") as HTMLDivElement;
-const importBtn = document.getElementById("import-btn") as HTMLButtonElement;
+const importBtn = document.getElementById("go-btn") as HTMLButtonElement;
 const cancelBtn = document.getElementById("cancel-btn") as HTMLButtonElement;
 
 function setStatus(text: string, kind: "info" | "error" | "ok" = "info"): void {
@@ -29,6 +29,11 @@ async function doImport(): Promise<void> {
     setStatus("Port looks invalid.", "error");
     return;
   }
+  const portNum = Number(port);
+  if (portNum < 41783 || portNum > 41790) {
+    setStatus("Port must be 41783–41790 (manifest allowlist).", "error");
+    return;
+  }
   if (!/^\d{6}$/.test(code)) {
     setStatus("Code must be 6 digits.", "error");
     return;
@@ -38,7 +43,7 @@ async function doImport(): Promise<void> {
   setStatus("Connecting to Eagle bridge…");
 
   try {
-    const url = `http://127.0.0.1:${port}/session?code=${encodeURIComponent(code)}`;
+    const url = `http://localhost:${port}/session?code=${encodeURIComponent(code)}`;
     const res = await fetch(url, { method: "GET" });
     if (!res.ok) {
       setStatus(`Bridge returned ${res.status}. Is the Eagle plugin still open with this code?`, "error");
@@ -52,7 +57,7 @@ async function doImport(): Promise<void> {
       return;
     }
     setStatus(`Placing ${payload.images.length} image(s)…`);
-    post({ type: "import", images: payload.images });
+    post({ type: "run", images: payload.images });
   } catch (err) {
     setStatus(`Fetch failed: ${(err as Error).message}`, "error");
     importBtn.disabled = false;

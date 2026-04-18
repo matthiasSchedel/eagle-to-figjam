@@ -13,7 +13,7 @@ export interface BridgeResponse {
 }
 
 export type PluginMessage =
-  | { type: "import"; images: BridgeImage[] }
+  | { type: "run"; images: BridgeImage[] }
   | { type: "cancel" };
 
 export type PluginEvent =

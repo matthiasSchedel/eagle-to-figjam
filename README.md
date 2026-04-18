@@ -19,7 +19,7 @@ Two plugins talk over a short-lived local HTTP bridge:
 1. **Eagle plugin** — reads the current selection, encodes the images to base64, starts a localhost server on an ephemeral port, and shows a 6-digit pairing code.
 2. **FigJam plugin** — you paste the port + code, it pulls the images, and places each one as a rectangle with an image fill in a neat grid on the canvas.
 
-The server binds to `127.0.0.1` only, auto-closes after one successful pull or 5 minutes, and requires the pairing code as a query param.
+The server binds to `127.0.0.1` on a fixed port range (`41783`–`41790`; first free one wins) so the FigJam manifest can allowlist exact URLs. It auto-closes after one successful pull or 5 minutes and requires the pairing code as a query param.
 
 ## Install (developer mode)
 
@@ -29,7 +29,7 @@ npm run build
 ```
 
 ### Eagle
-Eagle → **Plugin** → **Developer** → **Import Local Project** → pick `packages/eagle-plugin/dist/` (after running `npm run build`).
+After `npm run build`, Eagle → **Plugin** → **Developer** → **Import Local Project** → pick `packages/eagle-plugin/`. The build writes `main.js` and `ui.html` next to `manifest.json` (Eagle's manifest loader doesn't resolve subdirectory paths).
 
 ### FigJam (Figma desktop)
 Plugins → **Development** → **Import plugin from manifest…** → pick `packages/figjam-plugin/manifest.json`.
@@ -52,9 +52,11 @@ npm run typecheck
 ## Limits
 
 - PNG / JPG / GIF only. Other files in the selection are skipped.
-- Images larger than 4096 px on the longest edge are downscaled before upload (Figma plugin API limit).
+- Images larger than 4096 px on the longest edge are downscaled before upload (Figma plugin API limit). Downscale requires `sharp`; if unavailable, oversized images are skipped with a warning.
 - Both apps must be on the same machine (loopback only).
 - Sessions are one-shot and expire after 5 minutes. Re-run the Eagle plugin for a fresh code.
+- Bridge uses one of ports `41783`–`41790`. If all are busy, the plugin reports an error.
+- In Figma, local development plugins show a generic placeholder icon — that's a Figma UX quirk, not a bug in this plugin. Community-published builds will have a proper icon.
 
 ## Security
 

@@ -6,7 +6,7 @@
   "arch": "all",
   "logo": "logo.png",
   "keywords": ["figjam", "figma", "export", "bridge"],
-  "devTools": true,
+  "devTools": false,
   "main": {
     "url": "ui.html",
     "width": 440,
