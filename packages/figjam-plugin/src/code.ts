@@ -8,7 +8,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
     figma.closePlugin();
     return;
   }
-  if (msg.type !== "import") return;
+  if (msg.type !== "run") return;
 
   try {
     const { images } = msg;
@@ -42,7 +42,7 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
 
     if (nodes.length > 1) {
       const group = figma.group(nodes, figma.currentPage);
-      group.name = `Eagle import (${nodes.length})`;
+      group.name = `Eagle batch (${nodes.length})`;
       figma.viewport.scrollAndZoomIntoView([group]);
       figma.currentPage.selection = [group];
     } else if (nodes.length === 1) {
