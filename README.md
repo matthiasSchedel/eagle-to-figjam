@@ -2,6 +2,16 @@
 
 One-click export of images selected in [Eagle](https://eagle.cool) onto the [FigJam](https://www.figma.com/figjam/) canvas.
 
+![status](https://img.shields.io/badge/status-early-orange) ![license](https://img.shields.io/badge/license-MIT-blue)
+
+```
+┌────────────────────┐   localhost:<port>/session   ┌──────────────────────┐
+│ Eagle Plugin       │ ───────────────────────────► │ FigJam Plugin        │
+│ getSelected() →    │   JSON: { code, images[] }   │ createImage + rect   │
+│ fs → base64        │ ◄─────────────────────────── │ grid layout + group  │
+└────────────────────┘                              └──────────────────────┘
+```
+
 ## How it works
 
 Two plugins talk over a short-lived local HTTP bridge:
@@ -44,3 +54,18 @@ npm run typecheck
 - PNG / JPG / GIF only. Other files in the selection are skipped.
 - Images larger than 4096 px on the longest edge are downscaled before upload (Figma plugin API limit).
 - Both apps must be on the same machine (loopback only).
+- Sessions are one-shot and expire after 5 minutes. Re-run the Eagle plugin for a fresh code.
+
+## Security
+
+- Bridge binds to `127.0.0.1` only — never exposed on the network.
+- Pairing requires a 6-digit code sent as a query param; without it, every request returns `401`.
+- Server auto-closes after the first successful pull, on explicit `DELETE /session`, or after a 5-minute TTL.
+
+## Contributing
+
+Tests are `vitest`. New features should add a test first. Run `npm run typecheck && npm test` before committing.
+
+## License
+
+[MIT](./LICENSE)
